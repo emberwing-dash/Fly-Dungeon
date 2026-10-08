@@ -1,0 +1,9 @@
+# Netlify: the game is a static site that lives in web/ (no build step).
+[build]
+  publish = "web"
+  command = ""
+
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
