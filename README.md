@@ -1,6 +1,9 @@
 # Fly Dungeon
 
-Four ways to play with one real fruit-fly connectome (all in the browser, no API, no server):
+<img width="1500" height="850" alt="08-main-menu" src="https://github.com/user-attachments/assets/42529fbb-bdd6-415f-a1c1-f3a90a9ee3df" />
+
+
+# Four ways to play with one real fruit-fly connectome :
 
 * **Fly Dungeon** (`web/index.html`, the main game). Main menu, then **Play**, then choose a **fly type** (fruit fly, house fly, gnat) and spend stat points (speed, stamina, senses, reflex), the dungeon size, how many flies fly at once, and whether brains start **naive** or **pre-evolved**. The front end has a **3D toon-shaded main menu** with a fly that follows your mouse, a fly chooser with a turntable that updates as you pick a type or spend points, and a rounded glass HUD (design language borrowed from the author's earlier jam game Tiding Ocean). Flies go through a **3D dungeon** (brick walls, 3D fly models, and 3D enemies: spiders, slimes, a bird and a giant fly swatter that telegraphs its slam): grab the golden key, reach the green door, avoid patrolling critters, slimes, a chasing bird, spike traps and swatting humans, and eat honey. **Every fly has a live copy of the connectome brain. When a fly dies, the next fly hatches from the best brains so far, mutated, so each generation is smarter.** Three escapes open a bigger dungeon and the brains carry over. Controls: `Q` (or Tab) switches to the next fly, `M` opens the full dungeon map (the corner minimap always shows the key and exit), `P` takes control of the selected fly with WASD relative to the camera (its brain still dashes away from enemies for you), `L`/`K` switch parts of every brain off, drag to orbit, wheel to zoom, `Space` pauses, **`Esc` opens a pause menu (Resume / Quit to menu)** and freezes the simulation, and **holding the right mouse button + WASD pans the camera freely over the map** (it works while paused too; `F` or selecting a fly re-attaches the camera). On the chooser and brain screens, the round **`<` button at the top left** (or `Esc`) goes back.
 * **3D Colony** (`web/colony.html`): 28 flies in a 3D arena that evolve against swatting hands.
