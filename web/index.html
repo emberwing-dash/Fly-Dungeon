@@ -10,6 +10,7 @@
 </head>
 <body>
 <canvas id="stage" aria-hidden="true"></canvas>
+<button class="soundbtn" id="bSoundMenu" aria-label="Toggle sound" title="Sound on/off (N)">&#9835;</button>
 
 <!-- ============ MAIN MENU ============ -->
 <section class="screen" id="menu">
@@ -89,7 +90,7 @@ python verify_source.py</pre>
       <span class="pill"><i>Hatched</i><b id="hBirths">0</b></span>
       <span class="pill"><i>Lost</i><b id="hDeaths">0</b></span>
     </div>
-    <div class="topbtns"><button id="bMap" title="M">Map</button><button id="bPause" title="Space">Pause</button><button data-speed="1" class="on">1&times;</button><button data-speed="3">3&times;</button><button data-speed="8">8&times;</button><button id="bMenu" title="Esc">Menu</button></div>
+    <div class="topbtns"><button id="bSound" title="N">Sound</button><button id="bMap" title="M">Map</button><button id="bPause" title="Space">Pause</button><button data-speed="1" class="on">1&times;</button><button data-speed="3">3&times;</button><button data-speed="8">8&times;</button><button id="bMenu" title="Esc">Menu</button></div>
   </div>
   <div class="objective" id="objective"><svg id="arrow" viewBox="0 0 24 24" width="26" height="26"><path d="M12 2l7 18-7-4-7 4z" fill="currentColor"/></svg><span id="objText"></span></div>
   <aside class="panel left">
@@ -108,9 +109,9 @@ python verify_source.py</pre>
   </aside>
   <div class="minibox"><canvas id="mini" aria-label="Minimap"></canvas><span>M &nbsp; full map</span></div>
   <div class="bigmap" id="bigWrap" hidden><canvas id="bigmap" aria-label="Full dungeon map"></canvas><div class="legend"><span><i style="background:#7dffd1"></i>exit</span><span><i style="background:#ffd45e"></i>key</span><span><i style="background:#42e0b4"></i>flies</span><span><i style="background:#ff6b6b"></i>enemies</span><span><i style="background:#e8b84a"></i>honey</span><span>press M to close</span></div></div>
-  <div class="prompts"><span><kbd>Esc</kbd> pause</span><span><kbd>Q</kbd> next fly</span><span><kbd>M</kbd> map</span><span><kbd>P</kbd> take control (WASD)</span><span><kbd>L</kbd><kbd>K</kbd> brain switches</span><span>hold <kbd>right mouse</kbd> + <kbd>WASD</kbd> pan</span><span><kbd>F</kbd> follow</span><span>drag orbit &middot; wheel zoom</span></div>
+  <div class="prompts"><span><kbd>Esc</kbd> pause</span><span><kbd>Q</kbd> next fly</span><span><kbd>M</kbd> map</span><span><kbd>P</kbd> take control (WASD)</span><span><kbd>L</kbd><kbd>K</kbd> brain switches</span><span><kbd>N</kbd> sound</span><span>hold <kbd>right mouse</kbd> + <kbd>WASD</kbd> pan</span><span><kbd>F</kbd> follow</span><span>drag orbit &middot; wheel zoom</span></div>
   <div class="log" id="log" aria-live="polite"></div>
-  <div class="pausemenu" id="pauseMenu" hidden><div class="card"><h2>Paused</h2><p>The simulation is stopped. Every fly is frozen.</p><button class="btn primary" id="bResume">Resume</button><button class="btn" id="bQuit">Quit to menu</button><p class="note">Esc also resumes. You can still look around with the right mouse button and WASD.</p></div></div>
+  <div class="pausemenu" id="pauseMenu" hidden><div class="card"><h2>Paused</h2><p>The simulation is stopped. Every fly is frozen.</p><button class="btn primary" id="bResume">Resume</button><button class="btn" id="bQuit">Quit to menu</button><div class="vols"><label>Music <input type="range" id="volMusic" min="0" max="1" step="0.05"></label><label>Effects <input type="range" id="volSfx" min="0" max="1" step="0.05"></label></div><p class="note">Esc also resumes. You can still look around with the right mouse button and WASD. N mutes.</p></div></div>
 </section>
 
 <dialog id="dlgHow">

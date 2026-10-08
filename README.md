@@ -1,9 +1,6 @@
 # Fly Dungeon
 
-<img width="1500" height="850" alt="08-main-menu" src="https://github.com/user-attachments/assets/42529fbb-bdd6-415f-a1c1-f3a90a9ee3df" />
-
-
-# Four ways to play with one real fruit-fly connectome :
+Four ways to play with one real fruit-fly connectome (all in the browser, no API, no server):
 
 * **Fly Dungeon** (`web/index.html`, the main game). Main menu, then **Play**, then choose a **fly type** (fruit fly, house fly, gnat) and spend stat points (speed, stamina, senses, reflex), the dungeon size, how many flies fly at once, and whether brains start **naive** or **pre-evolved**. The front end has a **3D toon-shaded main menu** with a fly that follows your mouse, a fly chooser with a turntable that updates as you pick a type or spend points, and a rounded glass HUD (design language borrowed from the author's earlier jam game Tiding Ocean). Flies go through a **3D dungeon** (brick walls, 3D fly models, and 3D enemies: spiders, slimes, a bird and a giant fly swatter that telegraphs its slam): grab the golden key, reach the green door, avoid patrolling critters, slimes, a chasing bird, spike traps and swatting humans, and eat honey. **Every fly has a live copy of the connectome brain. When a fly dies, the next fly hatches from the best brains so far, mutated, so each generation is smarter.** Three escapes open a bigger dungeon and the brains carry over. Controls: `Q` (or Tab) switches to the next fly, `M` opens the full dungeon map (the corner minimap always shows the key and exit), `P` takes control of the selected fly with WASD relative to the camera (its brain still dashes away from enemies for you), `L`/`K` switch parts of every brain off, drag to orbit, wheel to zoom, `Space` pauses, **`Esc` opens a pause menu (Resume / Quit to menu)** and freezes the simulation, and **holding the right mouse button + WASD pans the camera freely over the map** (it works while paused too; `F` or selecting a fly re-attaches the camera). On the chooser and brain screens, the round **`<` button at the top left** (or `Esc`) goes back.
 * **3D Colony** (`web/colony.html`): 28 flies in a 3D arena that evolve against swatting hands.
@@ -33,6 +30,8 @@ Measured with `tools/dungeon-evolve.mjs` + `tools/dungeon-bench.mjs`: after 30 m
 Evolved flies get about twice as far, but they still mostly die on the way (they die to enemies more, because they get further). The game is hard on purpose, and "smarter" here means a better-tuned brain, not a solved dungeon. Fonts: Chewy (Apache 2.0) and Fredoka (OFL), served locally from `web/assets/fonts/`. Wall brick texture and the key and honey icons come from Block Land by VEXED (CC0, from `N:\GameJams\CookieJam`, copied to `web/assets/blockland/` with its licence); flies and enemies are 3D models built in code. Test URLs: `index.html?play=house&brain=evolved&warp=40&map=1` skips the menu and fast-forwards 40 simulated seconds, `?screen=setup` opens the fly chooser.
 
 Rebuild the pre-evolved brains: `cd tools && node dungeon-evolve.mjs 1800 1` (about a minute).
+
+**Sound:** all audio is synthesised live with the Web Audio API (no audio files, nothing to license): a generative dungeon music loop whose tempo and intensity rise as enemies close in, wing hum for the selected fly (it follows your mouse in the menu), and effects with distance fall-off and stereo panning for dashes, honey, the key, hurt, death, the swatter wind-up and slam, the bird alert and escapes. `N` or the speaker button mutes; music and effects sliders are in the pause menu.
 
 ## Proof that it is the real fly brain
 

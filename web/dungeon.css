@@ -162,3 +162,11 @@ dialog h2 { margin: 0 0 8px; font: 400 36px var(--title); color: var(--honey); }
 .pausemenu h2 { margin: 0; font: 400 52px/1 var(--title); text-shadow: 0 4px 0 #5b2d3c; }
 .pausemenu p { margin: 6px 0 12px; color: var(--ink2); }
 .pausemenu .note { font-size: 13px; color: var(--dim); margin-top: 10px; }
+
+.soundbtn { position: fixed; top: 20px; right: 20px; width: 52px; height: 52px; border: 0; border-radius: 50%; font: 400 26px/1 var(--title); color: var(--ink); background: rgba(34,22,58,.72); box-shadow: 0 4px 0 rgba(0,0,0,.35), inset 0 0 0 2px var(--edge); backdrop-filter: blur(6px); z-index: 5; padding: 0 0 3px; }
+.soundbtn:hover { background: rgba(255,244,221,.2); }
+.soundbtn.off { color: var(--dim); text-decoration: line-through; }
+.vols { display: grid; gap: 8px; margin: 6px 0 4px; text-align: left; }
+.vols label { display: grid; grid-template-columns: 70px 1fr; gap: 10px; align-items: center; font-size: 15px; color: var(--ink2); }
+.vols input[type=range] { width: 100%; accent-color: var(--orange); }
+#bSound.off { box-shadow: inset 0 0 0 3px var(--pink); color: var(--dim); }

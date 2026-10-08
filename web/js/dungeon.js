@@ -6,6 +6,8 @@ import { Wiring } from './colony-core.js';
 import { Dungeon, TYPES, STAT_KEYS, FREE_POINTS, GENE_NAMES, DT, T } from './dungeon-core.js';
 import { buildFly, FLYSPEC, lam, sph, cyl, box, addOutlines } from './flymodel.js';
 import { Stage3D } from './stage3d.js';
+import { Sound } from './audio.js';
+const sound = new Sound();
 
 const $ = (s) => document.querySelector(s);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -28,6 +30,7 @@ async function loadAll() {
 function show(id) {
   S.screen = id; for (const s of ['menu', 'setup', 'brainScreen']) $('#' + s).hidden = s !== id; $('#game').hidden = id !== 'game'; $('#stage').hidden = id === 'game';
   if (stage && id !== 'game') stage.setMode(id === 'menu' ? 'menu' : id === 'setup' ? 'setup' : 'brain');
+  sound.setMode(id === 'game' ? 'game' : 'menu'); $('#bSoundMenu').hidden = id === 'game'; if (id !== 'game') sound.hum(0);
 }
 const TYPE_TAGS = { fruit: 'balanced', house: 'fast, tough', gnat: 'tiny, twitchy' };
 const flyTypes = Object.keys(TYPES);
@@ -36,7 +39,7 @@ function buildSetup() {
   const box = $('#types'); box.innerHTML = '';
   for (const [k, t] of Object.entries(TYPES)) {
     const b = document.createElement('button'); b.className = 'type' + (k === S.type ? ' on' : ''); b.dataset.k = k;
-    b.innerHTML = `<i style="background:${hex(FLYSPEC[k].thorax)}"></i>${t.name}<small>${TYPE_TAGS[k]}</small>`; b.onclick = () => chooseType(k); box.appendChild(b);
+    b.innerHTML = `<i style="background:${hex(FLYSPEC[k].thorax)}"></i>${t.name}<small>${TYPE_TAGS[k]}</small>`; b.dataset.snd = 'pop'; b.onclick = () => chooseType(k); box.appendChild(b);
   }
   if (!S.stats) S.stats = { ...TYPES[S.type].base };
   $('#typeName').textContent = TYPES[S.type].name; $('#typeBlurb').textContent = TYPES[S.type].blurb;
@@ -47,7 +50,7 @@ function buildSetup() {
     row.innerHTML = `<span>${labels[k]}</span><span class="pillbar"><u style="width:${S.stats[k] * 10}%"></u></span><b>${S.stats[k]}</b><button aria-label="Less ${labels[k]}">&minus;</button><button aria-label="More ${labels[k]}">+</button>`;
     const [minus, plus] = row.querySelectorAll('button');
     minus.disabled = S.stats[k] <= TYPES[S.type].base[k]; plus.disabled = S.free <= 0 || S.stats[k] >= 9;
-    minus.onclick = () => { S.stats[k]--; S.free++; buildSetup(); }; plus.onclick = () => { S.stats[k]++; S.free--; buildSetup(); };
+    minus.dataset.snd = 'statDown'; plus.dataset.snd = 'statUp'; minus.onclick = () => { S.stats[k]--; S.free++; buildSetup(); }; plus.onclick = () => { S.stats[k]++; S.free--; buildSetup(); };
     st.appendChild(row);
   }
   $('#pts').textContent = `${S.free} points left`;
@@ -70,7 +73,7 @@ function initBrainScreen() { buildProv(); if (ids && stage && !stage.cloud) stag
 function poke(kind) {
   const [stim, strength] = BRAIN_TYPES[kind]; const types = casesData.cases.find((c) => c.id === stim).stimulus.types;
   const sil = kind === 'blind' ? new Set(['LC4', 'LPLC2'].map((t) => brainObj.typeId(t))) : [];
-  const x = brainObj.run(brainObj.drive(types, strength), sil); const act = Float32Array.from(x); stage.setActivity(act);
+  const x = brainObj.run(brainObj.drive(types, strength), sil); const act = Float32Array.from(x); stage.setActivity(act); sound.play('poke', { level: kind === 'blind' ? 0.1 : kind === 'taste' ? 0.3 : 0.8 });
   const order = Array.from(act.keys()).sort((a, b) => act[b] - act[a]); const fired = act.reduce((s, v) => s + (v > 0.05 ? 1 : 0), 0);
   const cmds = ['escape', 'approach', 'feed'].map((b) => { const cells = casesData.behaviours[b].cells; let s = 0, c = 0; for (const nm of cells) { const t = brainObj.typeId(nm); if (t === undefined) continue; for (const i of brainObj.byType[t]) { s += act[i]; c++; } } return [b, c ? s / c : 0]; });
   const label = { escape: 'Escape neurons (DNp01/02/04)', approach: 'Approach neurons (DNp09, DNg97, DNg100)', feed: 'Proboscis neuron (MN9)' };
@@ -88,6 +91,7 @@ scene.add(new THREE.HemisphereLight(0xcdd6ff, 0x4a3470, 1.6));
 const keyLight = new THREE.DirectionalLight(0xfff0d0, 1.1); keyLight.position.set(4, 10, 3); scene.add(keyLight);
 const flyLight = new THREE.PointLight(0xffe9b8, 3, 20, 1.4); scene.add(flyLight);
 const fx = $('#fx'), fxc = fx.getContext('2d');
+function sp(x, z) { const dx = x - cam.tx, dz = z - cam.tz, d = Math.hypot(dx, dz), side = dx * Math.cos(cam.az) - dz * Math.sin(cam.az); return { vol: Math.pow(clamp(1 - d / 22, 0, 1), 1.3), pan: clamp(side / 14, -1, 1) }; }
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); fx.width = w; fx.height = h; }
 addEventListener('resize', resize); resize();
 
@@ -204,6 +208,7 @@ function startGame() {
   show('game'); resize(); buildLevel(); selectLeader(); snapCamera(); say('Level 1. Find the golden key, then reach the green door. 3 escapes open the next dungeon.', 'gold'); lastT = performance.now(); if (!running) { running = true; requestAnimationFrame(loop); }
 }
 addEventListener('keydown', (e) => {
+  sound.unlock(); if (e.code === 'KeyN' && !e.repeat) { toggleMute(); return; }
   if ($('#game').hidden || !dungeon) { if (e.code === 'Escape' && (S.screen === 'setup' || S.screen === 'brainScreen')) show('menu'); return; }
   S.keys[e.code] = true;
   if (e.code === 'Escape') { if (S.mapOpen) toggleMap(); else openMenu(!S.menuOpen); return; }
@@ -218,11 +223,12 @@ addEventListener('keydown', (e) => {
   if (e.code.startsWith('Arrow')) e.preventDefault();
 });
 addEventListener('keyup', (e) => { S.keys[e.code] = false; });
+function toggleMute() { sound.unlock(); sound.setMuted(!sound.muted); $('#bSound').classList.toggle('off', sound.muted); $('#bSoundMenu').classList.toggle('off', sound.muted); }
 function setSpeed(v) { S.speed = v; document.querySelectorAll('[data-speed]').forEach((b) => b.classList.toggle('on', +b.dataset.speed === v)); }
 function togglePause() { S.paused = !S.paused; $('#bPause').textContent = S.paused ? 'Resume' : 'Pause'; }
-function openMenu(open) { if (S.menuOpen === open) return; S.menuOpen = open; if (open) { S.pausedBefore = S.paused; S.paused = true; } else { S.paused = !!S.pausedBefore; } $('#pauseMenu').hidden = !open; $('#bPause').textContent = S.paused ? 'Resume' : 'Pause'; }
+function openMenu(open) { if (S.menuOpen === open) return; sound.setPaused(open); sound.play(open ? 'pause' : 'resume'); S.menuOpen = open; if (open) { S.pausedBefore = S.paused; S.paused = true; } else { S.paused = !!S.pausedBefore; } $('#pauseMenu').hidden = !open; $('#bPause').textContent = S.paused ? 'Resume' : 'Pause'; }
 function toggleMap() { S.mapOpen = !S.mapOpen; $('#bigWrap').hidden = !S.mapOpen; if (S.mapOpen) bigMap(); }
-function tog(w) { const l = { ...dungeon.lesion }; if (w === 'L') l.loom = !l.loom; else l.taste = !l.taste; dungeon.setLesions(l.loom, l.taste); $('#tL').setAttribute('aria-pressed', l.loom); $('#tK').setAttribute('aria-pressed', l.taste); say(w === 'L' ? (l.loom ? 'Shadow detectors LC4 and LPLC2 are off in every fly. Enemies will not register!' : 'Shadow detectors restored.') : (l.taste ? 'Taste relay GNG117 cut. Honey cannot be eaten.' : 'Taste relay restored.'), l.loom || l.taste ? 'bad' : 'good'); }
+function tog(w) { const l = { ...dungeon.lesion }; if (w === 'L') l.loom = !l.loom; else l.taste = !l.taste; dungeon.setLesions(l.loom, l.taste); $('#tL').setAttribute('aria-pressed', l.loom); $('#tK').setAttribute('aria-pressed', l.taste); sound.play(l.loom || l.taste ? 'lesion' : 'restore'); say(w === 'L' ? (l.loom ? 'Shadow detectors LC4 and LPLC2 are off in every fly. Enemies will not register!' : 'Shadow detectors restored.') : (l.taste ? 'Taste relay GNG117 cut. Honey cannot be eaten.' : 'Taste relay restored.'), l.loom || l.taste ? 'bad' : 'good'); }
 function toggleManual() { if (!S.sel || !S.sel.alive) return; S.freecam = false; if (S.sel.manual) { S.sel.manual = null; say('You released the fly. Its brain is back in charge.'); } else { S.sel.manual = { x: 0, y: 0 }; say('You control this fly with WASD (relative to the camera). Its brain still dashes away from enemies and eats honey for you.', 'gold'); } }
 function cycle(dir) { const a = dungeon.flies.filter((f) => f.alive); if (!a.length) return; S.freecam = false; const i = a.indexOf(S.sel); if (S.sel && S.sel.manual) S.sel.manual = null; S.sel = a[(i + dir + a.length) % a.length]; say(`Now following fly #${S.sel.id} (gen ${S.sel.gen}).`); }
 function selectLeader() { const a = dungeon.flies.filter((f) => f.alive); if (a.length) S.sel = a.reduce((b, f) => (f.bestProg > b.bestProg ? f : b), a[0]); }
@@ -243,15 +249,15 @@ function pick(e) { const r = canvas.getBoundingClientRect(); ray.setFromCamera(n
 function say(msg, cls = '') { const l = $('#log'); const d = document.createElement('div'); d.className = cls; d.textContent = msg; l.appendChild(d); while (l.children.length > 4) l.firstChild.remove(); setTimeout(() => d.remove(), 5200); }
 function drain() {
   for (const e of dungeon.events) {
-    if (e.type === 'death') { burst(e.x, e.y, 0xff6b8b, 14, 3); if (dungeon.deaths < 40 || dungeon.deaths % 5 === 0) say(`Fly #${e.id} (gen ${e.gen}) ${e.cause === 'starved' ? 'starved' : 'was killed'} at ${Math.round(e.prog * 100)}% of the way.`, 'bad'); if (S.sel && S.sel.id === e.id) selectLeader(); }
-    else if (e.type === 'birth') { if (e.gen >= 2 && dungeon.births % 6 === 0) say(`Fly #${e.id} hatches (gen ${e.gen}) with a mutated copy of a brain that scored ${Math.round(e.parentFit)}.`, 'good'); }
-    else if (e.type === 'escape') { say(`Fly #${e.id} (gen ${e.gen}) ESCAPED the dungeon!`, 'gold'); const f = dungeon.flies.find((q) => q.id === e.id); if (f) burst(f.x, f.y, 0xffc83c, 30, 4); if (S.sel && S.sel.id === e.id) selectLeader(); }
-    else if (e.type === 'level') { buildLevel(); if (e.level > 1) say(`Level ${e.level}. The brains carry over. New dungeon, more enemies.`, 'gold'); selectLeader(); snapCamera(); }
-    else if (e.type === 'dash') { const f = dungeon.flies.find((q) => q.id === e.id); if (f) burst(f.x, f.y, 0xcfeaff, 6, 2); }
-    else if (e.type === 'eat') { burst(e.x, e.y, 0xffc83c, 10, 2); S.texts.push({ x: e.x, z: e.y, t: '+honey', life: 1 }); }
-    else if (e.type === 'key') { const f = dungeon.flies.find((q) => q.id === e.id); if (f) S.texts.push({ x: f.x, z: f.y, t: 'KEY!', life: 1.3 }); }
-    else if (e.type === 'slam') { burst(e.x, e.y, 0xffffff, 16, 4); cam.shake = 0.25; }
-    else if (e.type === 'hurt') burst(e.x, e.y, 0xff9bb0, 5, 2);
+    if (e.type === 'death') { burst(e.x, e.y, 0xff6b8b, 14, 3); sound.play('death', sp(e.x, e.y)); if (dungeon.deaths < 40 || dungeon.deaths % 5 === 0) say(`Fly #${e.id} (gen ${e.gen}) ${e.cause === 'starved' ? 'starved' : 'was killed'} at ${Math.round(e.prog * 100)}% of the way.`, 'bad'); if (S.sel && S.sel.id === e.id) selectLeader(); }
+    else if (e.type === 'birth') { sound.play('birth', { vol: 0.5 }); if (e.gen >= 2 && dungeon.births % 6 === 0) say(`Fly #${e.id} hatches (gen ${e.gen}) with a mutated copy of a brain that scored ${Math.round(e.parentFit)}.`, 'good'); }
+    else if (e.type === 'escape') { sound.play('escape', { vol: 0.9 }); say(`Fly #${e.id} (gen ${e.gen}) ESCAPED the dungeon!`, 'gold'); const f = dungeon.flies.find((q) => q.id === e.id); if (f) burst(f.x, f.y, 0xffc83c, 30, 4); if (S.sel && S.sel.id === e.id) selectLeader(); }
+    else if (e.type === 'level') { if (e.level > 1) sound.play('level'); buildLevel(); if (e.level > 1) say(`Level ${e.level}. The brains carry over. New dungeon, more enemies.`, 'gold'); selectLeader(); snapCamera(); }
+    else if (e.type === 'dash') { const f = dungeon.flies.find((q) => q.id === e.id); if (f) { burst(f.x, f.y, 0xcfeaff, 6, 2); sound.play('dash', sp(f.x, f.y)); } }
+    else if (e.type === 'eat') { sound.play('eat', sp(e.x, e.y)); burst(e.x, e.y, 0xffc83c, 10, 2); S.texts.push({ x: e.x, z: e.y, t: '+honey', life: 1 }); }
+    else if (e.type === 'key') { const f = dungeon.flies.find((q) => q.id === e.id); if (f) { S.texts.push({ x: f.x, z: f.y, t: 'KEY!', life: 1.3 }); sound.play('key', sp(f.x, f.y)); } }
+    else if (e.type === 'slam') { burst(e.x, e.y, 0xffffff, 16, 4); cam.shake = 0.25; sound.play('slam', sp(e.x, e.y)); }
+    else if (e.type === 'hurt') { burst(e.x, e.y, 0xff9bb0, 5, 2); sound.play('hurt', sp(e.x, e.y)); }
   }
   dungeon.events.length = 0;
 }
@@ -259,7 +265,9 @@ function drain() {
 // ------------------------------------------------------------------ main loops
 let lastT = 0, acc = 0, hudT = 0, running = false, stageLast = 0;
 function loop(now) { requestAnimationFrame(loop); if (!dungeon || $('#game').hidden) return; try { frameStep(now); } catch (e) { console.error('frame error', e); window.__lastError = String(e && e.stack || e); } }
-function stageLoop(now) { requestAnimationFrame(stageLoop); if (!stage || !$('#game').hidden) { stageLast = now; return; } const dt = Math.min(0.05, (now - stageLast) / 1000); stageLast = now; stage.tick(dt); }
+function stageLoop(now) { requestAnimationFrame(stageLoop); if (!stage || !$('#game').hidden) { stageLast = now; return; } const dt = Math.min(0.05, (now - stageLast) / 1000); stageLast = now; stage.tick(dt);
+  const P = stage.pointer, mv = Math.hypot(P.x - (stageLoop.px ?? P.x), P.y - (stageLoop.py ?? P.y)); stageLoop.px = P.x; stageLoop.py = P.y; stageLoop.v = (stageLoop.v || 0) * 0.9 + mv * 2;
+  if (S.screen === 'menu') sound.hum(clamp(0.25 + stageLoop.v * 6, 0, 1), 200 + stageLoop.v * 400); else if (S.screen === 'setup') sound.hum(0.45, { fruit: 220, house: 160, gnat: 320 }[S.type] || 200); else sound.hum(0); }
 function frameStep(now) {
   const dt = Math.min(0.1, (now - lastT) / 1000); lastT = now;
   const kk = S.keys, panning = S.rmb && (kk.KeyW || kk.KeyA || kk.KeyS || kk.KeyD || kk.ArrowUp || kk.ArrowDown || kk.ArrowLeft || kk.ArrowRight);
@@ -285,6 +293,7 @@ function render(t, dt) {
   for (const { h, s, gl } of honeyMeshes) { s.visible = gl.visible = !h.taken; if (!h.taken) { s.material.map = tileTex(Math.floor(t * 8) % 6, 84); s.position.y = 0.3 + Math.sin(t * 4 + h.x) * 0.06; } }
   for (const e of L.enemies) {
     const E = ents.get(e); if (!E) continue; const { o, sh } = E; sh.position.x = e.x; sh.position.z = e.y;
+    if (E.snd !== e.state) { if (e.kind === 'human' && e.state === 'wind') sound.play('swatWind', sp(e.tx, e.ty)); if (e.kind === 'bird' && e.state === 'chase') sound.play('bird', sp(e.x, e.y)); E.snd = e.state; }
     if (e.kind === 'patrol') {
       o.position.set(e.x, 0, e.y); const want = Math.atan2(e.dx, e.dy); let dr = want - o.rotation.y; while (dr > Math.PI) dr -= 6.283; while (dr < -Math.PI) dr += 6.283; o.rotation.y += dr * Math.min(1, dt * 10);
       o.userData.legs.forEach((l) => { const ph = e.anim * 1.6 + l.userData.k * 1.6 + (l.userData.side > 0 ? Math.PI : 0); l.rotation.z = Math.sin(ph) * 0.18; l.position.y = 0.4 + Math.max(0, Math.sin(ph)) * 0.08; });
@@ -321,6 +330,8 @@ function render(t, dt) {
   for (let i = n; i < 400; i++) pos[i * 3 + 1] = -50;
   partsPts.geometry.attributes.position.needsUpdate = true; partsPts.geometry.attributes.color.needsUpdate = true;
   for (const fl of d.flies) if (fl.alive) { const ex = Math.floor(fl.x), ey = Math.floor(fl.y); for (let j = -5; j <= 5; j++) for (let i = -5; i <= 5; i++) { const nx = ex + i, ny = ey + j; if (nx >= 0 && ny >= 0 && nx < L.W && ny < L.H && i * i + j * j < 26) S.explored[ny * L.W + nx] = 1; } }
+  const hf = S.sel && S.sel.alive ? S.sel : null; sound.hum(hf && !S.paused ? clamp(hf.v / 5, 0.25, 1) * sp(hf.x, hf.y).vol : 0, { fruit: 220, house: 160, gnat: 320 }[dungeon.cfg.type] || 200);
+  let danger = 0; for (const fl of d.flies) if (fl.alive) danger = Math.max(danger, fl.esc * 1.2, fl.loom / 0.45); sound.setIntensity(S.paused ? 0 : danger);
   renderer.render(scene, camera);
   overlay(dt);
 }
@@ -390,6 +401,12 @@ function bigMap() { const L = dungeon.L; const s = Math.max(4, Math.floor(Math.m
 
 // ------------------------------------------------------------------ boot
 function wireUI() {
+  addEventListener('pointerdown', () => sound.unlock());
+  document.addEventListener('mouseover', (e) => { const t = e.target.closest && e.target.closest('.btn,.type,.seg button,.arrow,.backbtn,.topbtns button,.panel button,.fly,.stat button,.soundbtn'); if (t && !t.disabled && t !== wireUI.lastHover) { sound.play('hover'); } wireUI.lastHover = t; });
+  document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('button'); if (!b || b.disabled) return; if (b.dataset.poke) return; const s = b.dataset.snd || (b.id === 'bBack' || b.id === 'bBrainBack' ? 'back' : b.id === 'bStart' ? 'start' : b.id === 'bPause' || b.id === 'bMenu' || b.id === 'bResume' || b.id === 'bSound' || b.id === 'bSoundMenu' ? '' : 'click'); if (s) sound.play(s); });
+  $('#bSound').onclick = toggleMute; $('#bSoundMenu').onclick = toggleMute;
+  const vm = $('#volMusic'), vs = $('#volSfx'); vm.value = sound.music; vs.value = sound.sfx; vm.oninput = () => sound.setMusic(+vm.value); vs.oninput = () => { sound.setSfx(+vs.value); sound.play('eat', { vol: 0.6 }); };
+  $('#bSound').classList.toggle('off', sound.muted); $('#bSoundMenu').classList.toggle('off', sound.muted);
   $('#bPlay').onclick = () => { buildSetup(); show('setup'); };
   $('#bBrain').onclick = () => { show('brainScreen'); initBrainScreen(); };
   $('#bBrainBack').onclick = () => show('menu');
@@ -407,11 +424,12 @@ function wireUI() {
 wireUI(); S.stats = { ...TYPES.fruit.base };
 loadAll().then(() => {
   stage = new Stage3D($('#stage'), { brickTex: tileTex(11, 69) }); requestAnimationFrame(stageLoop); show('menu');
-  $('#stage').addEventListener('pointerdown', () => { if (S.screen === 'menu') stage.pulse(); });
+  $('#stage').addEventListener('pointerdown', () => { if (S.screen === 'menu') { stage.pulse(); sound.play('zip'); } });
   const b = $('#bStart'); b.disabled = false; b.textContent = 'Enter the dungeon';
   const qs = new URLSearchParams(location.search);       // ?screen=setup|brain, ?play=house&brain=evolved&warp=60&map=1 : used for screenshots/tests
   if (qs.get('screen') === 'setup') { if (qs.get('type')) S.type = qs.get('type'); S.stats = { ...TYPES[S.type].base }; buildSetup(); show('setup'); stage.tick(0.05); }
   if (qs.get('screen') === 'brain') { show('brainScreen'); initBrainScreen(); if (qs.get('poke')) poke(qs.get('poke')); }
   if (qs.get('play')) { S.type = TYPES[qs.get('play')] ? qs.get('play') : 'fruit'; S.stats = { ...TYPES[S.type].base }; S.brain = qs.get('brain') || 'naive'; if (qs.get('size')) S.size = qs.get('size'); startGame(); const w = +qs.get('warp') || 0; for (let i = 0; i < w * 20; i++) dungeon.step(); drain(); selectLeader(); snapCamera(); if (qs.get('az')) cam.az = +qs.get('az'); if (qs.get('map')) toggleMap(); }
 }).catch((e) => { $('#bStart').textContent = 'Could not load data. Serve over http.'; console.error(e); });
+window.__sound = sound;
 window.__dungeon = { get d() { return dungeon; }, S, cam, get stage() { return stage; } };
