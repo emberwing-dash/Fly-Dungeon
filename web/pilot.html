@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fly Dungeon: Fly Pilot (solo)</title>
+<meta name="description" content="Fly a fruit fly in 3D. Its escape reflex is computed by the real fruit-fly connectome.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23101a2c'/%3E%3Cellipse cx='16' cy='19' rx='5' ry='8' fill='%2342e0b4'/%3E%3Ccircle cx='16' cy='9' r='4' fill='%2342e0b4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="play.css">
+</head>
+<body>
+<canvas id="view" aria-label="3D view of the fly"></canvas>
+
+<div class="hud" id="hud" hidden>
+  <div class="stats">
+    <div><span class="k">Berries</span><b id="sBerries">0</b></div>
+    <div><span class="k">Lives</span><b id="sLives">3</b></div>
+    <div><span class="k">Time</span><b id="sTime">90</b></div>
+  </div>
+  <div class="brain" aria-live="polite">
+    <div class="bt">Real fly brain, live <span id="brainMs"></span></div>
+    <div class="bar"><span>Looming signal</span><i><u id="bLoom"></u></i></div>
+    <div class="bar esc"><span>Escape neurons</span><i><u id="bEsc"></u></i></div>
+    <div class="bar"><span>Feeding neuron</span><i><u id="bFeed"></u></i></div>
+    <div class="tog"><button id="tL" aria-pressed="false">L &middot; Blind the shadow detectors</button><button id="tK" aria-pressed="false">K &middot; Cut the taste relay</button></div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+</div>
+
+<div class="screen" id="title">
+  <div class="card">
+    <h1>Fly Pilot</h1>
+    <p class="lead">You are a fruit fly. Eat berries. Don't get swatted.</p>
+    <ul class="keys">
+      <li><kbd>W</kbd><kbd>S</kbd> faster / slower</li>
+      <li><kbd>A</kbd><kbd>D</kbd> turn</li>
+      <li><kbd>Space</kbd> up &nbsp; <kbd>Shift</kbd> down</li>
+    </ul>
+    <p class="note">When a hand comes down, your <b>real fruit-fly connectome</b> (6,484 neurons of FlyEM's wiring diagram) decides when to trigger the escape jump. You can switch parts of that brain off with <kbd>L</kbd> and <kbd>K</kbd> and feel what breaks.</p>
+    <button class="go" id="btnStart" disabled>Loading brain&hellip;</button>
+    <p class="small"><a href="index.html">Main menu</a> &middot; <a href="colony.html">3D colony</a> &middot; <a href="lab.html">Puzzle lab</a> &middot; Best: <b id="best">0</b></p>
+  </div>
+</div>
+
+<div class="screen" id="over" hidden>
+  <div class="card">
+    <h1 id="overTitle">Game over</h1>
+    <p class="lead" id="overMsg"></p>
+    <button class="go" id="btnAgain">Fly again</button>
+  </div>
+</div>
+
+<script type="module" src="js/pilot.js"></script>
+</body>
+</html>

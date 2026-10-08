@@ -1,0 +1,62 @@
+{
+ "prey": {
+  "r2_target": 0.998,
+  "mae_target": 0.003,
+  "score_corr": 0.999,
+  "precision_top50_in_top10pct": 1.0,
+  "single_move_top3_found_in_top10": 3,
+  "n_train": 9000,
+  "n_test": 1500,
+  "seconds": 127.7
+ },
+ "loom": {
+  "r2_target": 1.0,
+  "mae_target": 0.002,
+  "score_corr": 1.0,
+  "precision_top50_in_top10pct": 1.0,
+  "single_move_top3_found_in_top10": 3,
+  "n_train": 9000,
+  "n_test": 1500,
+  "seconds": 131.4
+ },
+ "dust": {
+  "r2_target": 0.998,
+  "mae_target": 0.003,
+  "score_corr": 0.999,
+  "precision_top50_in_top10pct": 1.0,
+  "single_move_top3_found_in_top10": 3,
+  "n_train": 9000,
+  "n_test": 1500,
+  "seconds": 120.9
+ },
+ "taste": {
+  "r2_target": 0.999,
+  "mae_target": 0.007,
+  "score_corr": 0.999,
+  "precision_top50_in_top10pct": 1.0,
+  "single_move_top3_found_in_top10": 3,
+  "n_train": 9000,
+  "n_test": 1500,
+  "seconds": 133.7
+ },
+ "mate": {
+  "r2_target": 0.998,
+  "mae_target": 0.005,
+  "score_corr": 0.999,
+  "precision_top50_in_top10pct": 1.0,
+  "single_move_top3_found_in_top10": 3,
+  "n_train": 9000,
+  "n_test": 1500,
+  "seconds": 152.6
+ },
+ "loom2": {
+  "r2_target": 1.0,
+  "mae_target": 0.002,
+  "score_corr": 1.0,
+  "precision_top50_in_top10pct": 1.0,
+  "single_move_top3_found_in_top10": 3,
+  "n_train": 9000,
+  "n_test": 1500,
+  "seconds": 131.8
+ }
+}

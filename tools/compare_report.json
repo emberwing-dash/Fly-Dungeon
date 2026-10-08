@@ -1,0 +1,34 @@
+{
+ "naive (random genes)": {
+  "meanSurvivalSeconds": 14,
+  "survivorsOf28": 1,
+  "swatted": 4.1,
+  "starved": 22.9,
+  "berriesEaten": 29.4,
+  "rounds": 8
+ },
+ "evolved": {
+  "meanSurvivalSeconds": 41.2,
+  "survivorsOf28": 11.6,
+  "swatted": 3.4,
+  "starved": 13,
+  "berriesEaten": 232.3,
+  "rounds": 8
+ },
+ "evolved, shadow detectors off (L)": {
+  "meanSurvivalSeconds": 23.4,
+  "survivorsOf28": 0.6,
+  "swatted": 26.5,
+  "starved": 0.9,
+  "berriesEaten": 116.9,
+  "rounds": 8
+ },
+ "evolved, taste relay cut (K)": {
+  "meanSurvivalSeconds": 34.8,
+  "survivorsOf28": 7.4,
+  "swatted": 3.3,
+  "starved": 17.4,
+  "berriesEaten": 157.8,
+  "rounds": 8
+ }
+}

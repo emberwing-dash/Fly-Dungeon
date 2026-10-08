@@ -1,0 +1,177 @@
+{
+ "project": "fly-brain by Lulzx (browser-based embodied male fruit-fly connectome simulator)",
+ "repo": "https://github.com/Lulzx/fly-brain",
+ "commit": "ba0b4f815c00e81a2ef1f36165df2b1891e5e39c",
+ "commit_author": "lulzx",
+ "commit_date": "Mon Oct 5 11:22:08 2026 +0530",
+ "licence_project": "MIT",
+ "data_origin": "FlyEM / Janelia male CNS connectome v1.0 (CC-BY 4.0), packed by the project from gs://flyem-male-cns/v1.0",
+ "source_totals": {
+  "neurons": 165122,
+  "connections": 10511038,
+  "cell_types": 11752
+ },
+ "shipped": {
+  "neurons": 6484,
+  "connections": 193169,
+  "cell_types": 353
+ },
+ "files": {
+  "graph_w3.bin": {
+   "path": "ref2/fly/public/data/graph_w3.bin",
+   "bytes": 63726728,
+   "sha256": "c34efca42d074786e8fb4fe4b6723d5b15aa4d69be17b0cf457321cb2ac6e030"
+  },
+  "meta.json": {
+   "path": "ref2/fly/public/data/meta.json",
+   "bytes": 3178974,
+   "sha256": "580c2d5a210469a6ab1184ae2187dcc4ce8217c6f74043bd2e585c7b110ec36a"
+  },
+  "ntsign.bin": {
+   "path": "ref2/fly/public/data/ntsign.bin",
+   "bytes": 660488,
+   "sha256": "fbdfbbeb15c56077a792ff8b49d2d3823843df060d0f5eda8a21fb9eb6dda714"
+  },
+  "neurons.bin": {
+   "path": "ref2/fly/public/data/neurons.bin",
+   "bytes": 5449034,
+   "sha256": "c406acba63d75acd258bb42b4ba8d02cc6b64ebc5e2cf3e86fc750ff0da99046"
+  }
+ },
+ "sample_edges": [
+  {
+   "pre": "DNp70(CL305)_R",
+   "pre_body": 11133,
+   "post": "DNp01(GF)_R",
+   "post_body": 10001,
+   "synapses": 537,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 15770,
+   "weight_shipped": 0.03405199944972992,
+   "weight_from_source": 0.03405199746353836
+  },
+  {
+   "pre": "GNG454_R",
+   "pre_body": 45471,
+   "post": "DNg08_L",
+   "post_body": 25188,
+   "synapses": 14,
+   "transmitter_sign": -1.0,
+   "input_synapses_of_post": 445,
+   "weight_shipped": -0.03146067261695862,
+   "weight_from_source": -0.03146067415730337
+  },
+  {
+   "pre": "GNG537_L",
+   "pre_body": 514967,
+   "post": "MN9_L",
+   "post_body": 10331,
+   "synapses": 58,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 5833,
+   "weight_shipped": 0.00994342565536499,
+   "weight_from_source": 0.009943425338590777
+  },
+  {
+   "pre": "T2_R",
+   "pre_body": 80979,
+   "post": "T2_R",
+   "post_body": 72004,
+   "synapses": 4,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 551,
+   "weight_shipped": 0.007259528152644634,
+   "weight_from_source": 0.007259528130671506
+  },
+  {
+   "pre": "T2_R",
+   "pre_body": 65312,
+   "post": "T2_R",
+   "post_body": 73884,
+   "synapses": 5,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 466,
+   "weight_shipped": 0.010729613713920116,
+   "weight_from_source": 0.01072961373390558
+  },
+  {
+   "pre": "LC10a_L",
+   "pre_body": 74072,
+   "post": "LC10a_L",
+   "post_body": 89301,
+   "synapses": 7,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 335,
+   "weight_shipped": 0.020895522087812424,
+   "weight_from_source": 0.020895522388059702
+  },
+  {
+   "pre": "PVLP034_R",
+   "pre_body": 18028,
+   "post": "AVLP732m_R",
+   "post_body": 513413,
+   "synapses": 16,
+   "transmitter_sign": -1.0,
+   "input_synapses_of_post": 1489,
+   "weight_shipped": -0.010745466686785221,
+   "weight_from_source": -0.010745466756212223
+  },
+  {
+   "pre": "LPLC2_R",
+   "pre_body": 20471,
+   "post": "CL323_R",
+   "post_body": 76637,
+   "synapses": 9,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 1761,
+   "weight_shipped": 0.005110732279717922,
+   "weight_from_source": 0.005110732538330494
+  },
+  {
+   "pre": "JO-EV6_R",
+   "pre_body": 975394666,
+   "post": "JO-EV6_R",
+   "post_body": 399935690,
+   "synapses": 3,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 6,
+   "weight_shipped": 0.5,
+   "weight_from_source": 0.5
+  },
+  {
+   "pre": "LC17_R",
+   "pre_body": 26159,
+   "post": "LC17_R",
+   "post_body": 30151,
+   "synapses": 6,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 1554,
+   "weight_shipped": 0.0038610040210187435,
+   "weight_from_source": 0.003861003861003861
+  },
+  {
+   "pre": "T2_R",
+   "pre_body": 88021,
+   "post": "T2_R",
+   "post_body": 88214,
+   "synapses": 3,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 438,
+   "weight_shipped": 0.006849315017461777,
+   "weight_from_source": 0.00684931506849315
+  },
+  {
+   "pre": "LC19_R",
+   "pre_body": 21350,
+   "post": "LAL021_L",
+   "post_body": 42625,
+   "synapses": 7,
+   "transmitter_sign": 1.0,
+   "input_synapses_of_post": 1301,
+   "weight_shipped": 0.005380476359277964,
+   "weight_from_source": 0.005380476556495004
+  }
+ ],
+ "sample_max_abs_diff": 1.9861915584451495e-09,
+ "how_to_verify": "cd tools && python verify_source.py"
+}

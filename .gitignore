@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+tools/*.pkl
+tools/train.log
+tools/validation_full.json

@@ -1,0 +1,3 @@
+Chewy by Sorkin Type, Apache License 2.0 (Google Fonts).
+Fredoka by Milena Brandao and Hafontia, SIL Open Font License 1.1 (Google Fonts).
+Both were downloaded from Google Fonts and are served locally.

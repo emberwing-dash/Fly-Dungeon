@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fly Dungeon</title>
+<meta name="description" content="Send swarms of flies through a 3D dungeon. Every fly has a brain wired like the real fruit-fly connectome, and each new fly hatches smarter than the last.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23ffa24a'/%3E%3Cellipse cx='16' cy='19' rx='5' ry='8' fill='%23301a3c'/%3E%3Ccircle cx='16' cy='9' r='4' fill='%23301a3c'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="dungeon.css">
+</head>
+<body>
+<canvas id="stage" aria-hidden="true"></canvas>
+
+<!-- ============ MAIN MENU ============ -->
+<section class="screen" id="menu">
+  <div class="menu-left">
+    <p class="kicker">a dungeon of tiny brains</p>
+    <h1 class="logo">Fly<br><span>Dungeon</span></h1>
+    <h2 class="sub">Escape, evolve, repeat.</h2>
+    <p class="lede">Send flies through the dungeon. Every one that dies teaches the next.</p>
+    <div class="menu-buttons">
+      <button class="btn primary" id="bPlay">Play</button>
+      <button class="btn" id="bBrain">Proof: the real fly brain</button>
+      <button class="btn ghost" id="bHow">How it works</button>
+    </div>
+    <p class="hint">Move the mouse. Click the fly.</p>
+    <nav class="other"><a href="colony.html">3D colony</a><a href="pilot.html">Fly solo</a><a href="lab.html">Puzzle lab</a></nav>
+    <p class="credit">Brain data: Lulzx/fly-brain, built on the FlyEM male-CNS connectome. Art: Block Land by VEXED (CC0).</p>
+  </div>
+</section>
+
+<!-- ============ CHOOSE YOUR FLY ============ -->
+<section class="screen" id="setup" hidden>
+  <button class="backbtn" id="bBack" aria-label="Back to the menu" title="Back (Esc)">&lsaquo;</button>
+  <header class="title-top"><h2>Choose your fly</h2><p>Pick a body, spend your points, then see how the brain evolves.</p></header>
+  <div class="turn-label" id="turnLabel"><button class="arrow" id="bPrev" aria-label="Previous fly">&lsaquo;</button><div><b id="typeName">Fruit fly</b><span id="typeBlurb"></span></div><button class="arrow" id="bNext" aria-label="Next fly">&rsaquo;</button></div>
+  <aside class="sheet">
+    <h3>Fly type</h3>
+    <div class="types" id="types"></div>
+    <h3>Stats <span id="pts" class="pts"></span></h3>
+    <div id="stats"></div>
+    <h3>Dungeon</h3>
+    <div class="seg" id="segSize"><button data-v="small">Small</button><button data-v="medium" class="on">Medium</button><button data-v="large">Large</button></div>
+    <h3>Flies at once</h3>
+    <div class="seg" id="segN"><button data-v="4">4</button><button data-v="8" class="on">8</button><button data-v="12">12</button></div>
+    <h3>Brain at the start</h3>
+    <div class="seg" id="segBrain"><button data-v="naive" class="on">Naive</button><button data-v="evolved">Pre-evolved</button></div>
+    <p class="note" id="brainHint"></p>
+    <div class="row one"><button class="btn primary" id="bStart" disabled>Loading brain&hellip;</button></div>
+  </aside>
+</section>
+
+<!-- ============ BRAIN PROOF ============ -->
+<section class="screen" id="brainScreen" hidden>
+  <button class="backbtn" id="bBrainBack" aria-label="Back to the menu" title="Back (Esc)">&lsaquo;</button>
+  <header class="title-top"><h2>The real fly brain</h2><p>Every fly in this game runs on neurons from this wiring diagram. Check it yourself.</p></header>
+  <aside class="sheet left" id="provSheet">
+    <h3>Where it comes from</h3>
+    <div id="prov"></div>
+    <h3>Verify it yourself</h3>
+    <pre class="code" id="verifyCode">cd tools
+python verify_source.py</pre>
+    <p class="note">That script re-hashes the source files from the ref2 project and rebuilds every one of our 193,169 synapse weights from the raw connectome. It prints <b>ALL CHECKS PASSED</b> only if they match exactly.</p>
+  </aside>
+  <aside class="sheet right" id="pokeSheet">
+    <h3>Poke the brain</h3>
+    <p class="note">Each button stimulates real neurons and runs the real wiring. Lit dots are neurons that fired.</p>
+    <div class="pokes">
+      <button class="btn" data-poke="loom">A shadow looms</button>
+      <button class="btn" data-poke="prey">Smell of food</button>
+      <button class="btn" data-poke="taste">Sugar on the mouth</button>
+      <button class="btn danger" data-poke="blind">Shadow again, detectors cut</button>
+    </div>
+    <div id="pokeOut" class="pokeout"><p class="note">Press a button.</p></div>
+    <h3>Real synapses, recomputed</h3>
+    <div id="edges"></div>
+  </aside>
+</section>
+
+<!-- ============ GAME ============ -->
+<section id="game" hidden>
+  <canvas id="view" aria-label="3D dungeon"></canvas>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="topbar">
+    <div class="pills">
+      <span class="pill"><i>Level</i><b id="hLevel">1</b></span>
+      <span class="pill"><i>Escaped</i><b id="hEsc">0/3</b></span>
+      <span class="pill"><i>Alive</i><b id="hAlive">0</b></span>
+      <span class="pill"><i>Hatched</i><b id="hBirths">0</b></span>
+      <span class="pill"><i>Lost</i><b id="hDeaths">0</b></span>
+    </div>
+    <div class="topbtns"><button id="bMap" title="M">Map</button><button id="bPause" title="Space">Pause</button><button data-speed="1" class="on">1&times;</button><button data-speed="3">3&times;</button><button data-speed="8">8&times;</button><button id="bMenu" title="Esc">Menu</button></div>
+  </div>
+  <div class="objective" id="objective"><svg id="arrow" viewBox="0 0 24 24" width="26" height="26"><path d="M12 2l7 18-7-4-7 4z" fill="currentColor"/></svg><span id="objText"></span></div>
+  <aside class="panel left">
+    <h4>Learning curve</h4>
+    <canvas id="chart" width="260" height="100" aria-label="Chart of progress per fly in hatch order"></canvas>
+    <p class="muted" id="chartNote">Every dot is a fly. Higher means it got further before dying.</p>
+    <h4>Switch off parts of the brain</h4>
+    <button id="tL" aria-pressed="false">L &nbsp; Blind to enemies</button>
+    <button id="tK" aria-pressed="false">K &nbsp; Cut taste relay</button>
+  </aside>
+  <aside class="panel right">
+    <h4>Flies</h4>
+    <div id="roster"></div>
+    <h4>Selected</h4>
+    <div id="sel" class="muted">Click a fly, or press Q.</div>
+  </aside>
+  <div class="minibox"><canvas id="mini" aria-label="Minimap"></canvas><span>M &nbsp; full map</span></div>
+  <div class="bigmap" id="bigWrap" hidden><canvas id="bigmap" aria-label="Full dungeon map"></canvas><div class="legend"><span><i style="background:#7dffd1"></i>exit</span><span><i style="background:#ffd45e"></i>key</span><span><i style="background:#42e0b4"></i>flies</span><span><i style="background:#ff6b6b"></i>enemies</span><span><i style="background:#e8b84a"></i>honey</span><span>press M to close</span></div></div>
+  <div class="prompts"><span><kbd>Esc</kbd> pause</span><span><kbd>Q</kbd> next fly</span><span><kbd>M</kbd> map</span><span><kbd>P</kbd> take control (WASD)</span><span><kbd>L</kbd><kbd>K</kbd> brain switches</span><span>hold <kbd>right mouse</kbd> + <kbd>WASD</kbd> pan</span><span><kbd>F</kbd> follow</span><span>drag orbit &middot; wheel zoom</span></div>
+  <div class="log" id="log" aria-live="polite"></div>
+  <div class="pausemenu" id="pauseMenu" hidden><div class="card"><h2>Paused</h2><p>The simulation is stopped. Every fly is frozen.</p><button class="btn primary" id="bResume">Resume</button><button class="btn" id="bQuit">Quit to menu</button><p class="note">Esc also resumes. You can still look around with the right mouse button and WASD.</p></div></div>
+</section>
+
+<dialog id="dlgHow">
+  <form method="dialog">
+    <h2>How it works</h2>
+    <p>Every fly runs a <b>live copy of a slice of the real fruit-fly connectome</b>: 6,484 neurons and 193,169 connections taken from the FlyEM male-CNS wiring diagram, through the open <a href="https://github.com/Lulzx/fly-brain">Lulzx/fly-brain</a> project.</p>
+    <ul>
+      <li>An enemy growing in view drives the shadow detectors (LC4, LPLC2), which fire the <b>escape neurons</b>. The fly dashes away.</li>
+      <li>The smell of the key and the exit drives the <b>approach neurons</b>. The fly pushes toward it.</li>
+      <li>Honey touches the taste cells. The <b>proboscis neuron</b> must fire for the fly to eat.</li>
+    </ul>
+    <p>The wiring does not say how strong synapses are or when to act. Those 8 numbers per fly are <b>evolved</b>: when a fly dies, the next one hatches from the best brains so far, slightly mutated.</p>
+    <p class="muted">Where to go (the path) is supplied by the game, as in other embodied fly simulators. The brain decides whether to flee, push on, or eat.</p>
+    <button class="btn primary" value="close">Back</button>
+  </form>
+</dialog>
+<script type="module" src="js/dungeon.js"></script>
+</body>
+</html>

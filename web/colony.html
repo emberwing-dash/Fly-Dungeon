@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fly Dungeon: 3D Colony</title>
+<meta name="description" content="28 virtual fruit flies, each with a live brain wired like the real fly connectome, evolve to survive swatting hands and hunger.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23101a2c'/%3E%3Cellipse cx='16' cy='19' rx='5' ry='8' fill='%2342e0b4'/%3E%3Ccircle cx='16' cy='9' r='4' fill='%2342e0b4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="play.css">
+<link rel="stylesheet" href="colony.css">
+</head>
+<body>
+<canvas id="view" aria-label="3D view of the fly colony"></canvas>
+
+<header class="bar-top">
+  <div class="brand"><b>Fly Dungeon</b> Colony</div>
+  <div class="chips">
+    <span class="chip"><i>Generation</i><b id="gen">0</b></span>
+    <span class="chip"><i>Alive</i><b id="alive">28</b></span>
+    <span class="chip"><i>Time</i><b id="time">0</b></span>
+    <span class="chip"><i>Mode</i><b id="mode">&hellip;</b></span>
+  </div>
+  <nav class="links"><a href="index.html">Main menu</a><a href="pilot.html">Fly solo</a><a href="lab.html">Puzzle lab</a></nav>
+</header>
+
+<aside class="side">
+  <section>
+    <h2>Population</h2>
+    <div class="btns">
+      <button id="bEvolved" class="on">Evolved colony</button>
+      <button id="bNaive">Naive colony</button>
+    </div>
+    <label class="check"><input type="checkbox" id="cEvolve"> Keep evolving between rounds</label>
+    <div class="btns sp">
+      <button data-speed="1" class="on">1&times;</button><button data-speed="3">3&times;</button><button data-speed="8">8&times;</button><button id="bSkip" title="Fast-forward to the end of this round">Skip round</button>
+    </div>
+  </section>
+  <section>
+    <h2>Survival over generations</h2>
+    <canvas id="chart" width="260" height="110" aria-label="Chart of mean seconds survived per generation"></canvas>
+    <p class="muted" id="chartNote"></p>
+  </section>
+  <section>
+    <h2>Selected fly</h2>
+    <div id="sel" class="muted">Click a fly.</div>
+  </section>
+  <section>
+    <h2>You are the weather</h2>
+    <p class="muted"><b>Click</b> ground: drop a swatter. <b>Shift+click</b>: drop a berry. <b>Drag</b>: orbit, <b>wheel</b>: zoom. <b>Space</b>: pause.</p>
+    <div class="btns">
+      <button id="tL" aria-pressed="false">L &middot; Blind all flies to shadows</button>
+      <button id="tK" aria-pressed="false">K &middot; Cut everyone's taste relay</button>
+    </div>
+    <p class="muted">Both switch off real cell types in every fly's connectome brain.</p>
+  </section>
+</aside>
+
+<div class="toast" id="toast" role="status"></div>
+<div class="loading" id="loading">Loading connectome brains&hellip;</div>
+<script type="module" src="js/colony.js"></script>
+</body>
+</html>
